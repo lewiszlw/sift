@@ -54,11 +54,23 @@ async function save() {
 }
 
 function setKeyStatus(msg, ok) { const k = $("keyStatus"); k.textContent = msg; k.className = ok ? "ok" : "err"; }
+
+// Ask Chrome for access to the API host the user configured. Must be called
+// from a user gesture (a button click); Chrome no-ops if already granted.
+async function ensureApiPermission(apiUrl) {
+  let origin;
+  try { origin = new URL(apiUrl).origin + "/*"; } catch { return true; } // invalid URL: let Connect fail server-side
+  return chrome.permissions.request({ origins: [origin] });
+}
+
 $("connect").addEventListener("click", async () => {
   const key = $("apiKey").value.trim();
   if (!key) return setKeyStatus("Paste your key first.", false);
+  const apiUrl = $("apiUrl").value.trim() || XQF_DEFAULTS.apiUrl;
+  if (!(await ensureApiPermission(apiUrl)))
+    return setKeyStatus(`Browser denied access to ${new URL(apiUrl).origin}. Allow it to use this endpoint.`, false);
   setKeyStatus("Checking…", true);
-  const r = await chrome.runtime.sendMessage({ type: "test", apiKey: key, model: $("model").value.trim() || "jev-latest", apiUrl: $("apiUrl").value.trim() || XQF_DEFAULTS.apiUrl });
+  const r = await chrome.runtime.sendMessage({ type: "test", apiKey: key, model: $("model").value.trim() || "jev-latest", apiUrl });
   if (r.ok) {
     await chrome.storage.sync.set({ apiKey: key });
     setKeyStatus(`Connected to ${r.model}. Open x.com — Sift is on.`, true);
