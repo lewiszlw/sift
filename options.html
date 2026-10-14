@@ -120,6 +120,11 @@
         <input type="text" id="apiUrl" placeholder="https://api.typesafe.ai/v1/systemone" autocomplete="off" spellcheck="false">
         <div class="hint">Any Jev “systemone”-compatible server can be used here. The first time you connect to a new host, the browser will ask you to allow access to it.</div>
       </div>
+      <div class="field">
+        <label for="model">Model</label>
+        <input type="text" id="model" placeholder="jev-latest" spellcheck="false">
+        <div class="hint">Model name sent to the endpoint. What is valid depends on the server — defaults to <code>jev-latest</code>.</div>
+      </div>
     </div>
   </section>
 
@@ -172,10 +177,6 @@
         <div class="hint">One regular expression per line, case-insensitive. Lines starting with <code>#</code> are ignored.</div>
         <div class="actions"><button class="ghost" id="resetPhrases">Reset to defaults</button></div>
       </div>
-      <details>
-        <summary>Model</summary>
-        <div class="field"><input type="text" id="model" placeholder="jev-latest" spellcheck="false"></div>
-      </details>
     </div>
   </section>
 
