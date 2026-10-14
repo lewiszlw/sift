@@ -29,8 +29,7 @@ const XQF_DEFAULTS = {
   pausedUntil: 0,
   apiKey: "",
   model: "jev-latest",
-  // Jev "systemone" endpoint. OpenRouter proxies the same protocol at
-  // https://openrouter.ai/api/v1/systemone with an OpenRouter key.
+  // Jev "systemone" endpoint; point it at any compatible server.
   apiUrl: "https://api.typesafe.ai/v1/systemone",
   // which categories to hide: {insight:false, ..., bait:true}
   hide: Object.fromEntries(Object.entries(XQF_CATEGORIES).map(([k, c]) => [k, c.hide])),

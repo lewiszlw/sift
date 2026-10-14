@@ -1,8 +1,7 @@
 // Service worker: talks to TypeSafe Jev, caches verdicts, keeps stats.
 importScripts("defaults.js");
 
-// Default Jev endpoint; the user can point apiUrl at any compatible server
-// (e.g. OpenRouter's proxy: https://openrouter.ai/api/v1/systemone).
+// Default Jev endpoint; the user can point apiUrl at any compatible server.
 const DEFAULT_API_URL = "https://api.typesafe.ai/v1/systemone";
 const CACHE_KEY = "xqf_cache";
 const STATS_KEY = "xqf_stats";
