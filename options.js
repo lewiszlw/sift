@@ -1,5 +1,5 @@
 const $ = (id) => document.getElementById(id);
-const SIMPLE = ["apiKey", "model", "mode", "filterReplies", "showBadges", "hideSidebar", "stopPhrases", "allowlist", "blocklist"];
+const SIMPLE = ["apiKey", "apiUrl", "model", "mode", "filterReplies", "showBadges", "hideSidebar", "stopPhrases", "allowlist", "blocklist"];
 let hide = {}; let hideAI = true; let hideOffTopic = true;
 
 function flash(msg, err = false) {
@@ -38,6 +38,7 @@ function collect() {
   const out = { hide, hideAI, hideOffTopic };
   for (const f of SIMPLE) { const el = $(f); out[f] = el.type === "checkbox" ? el.checked : el.value.trim(); }
   if (!out.model) out.model = "jev-latest";
+  if (!out.apiUrl) out.apiUrl = XQF_DEFAULTS.apiUrl;
   return out;
 }
 
@@ -57,7 +58,7 @@ $("connect").addEventListener("click", async () => {
   const key = $("apiKey").value.trim();
   if (!key) return setKeyStatus("Paste your key first.", false);
   setKeyStatus("Checking…", true);
-  const r = await chrome.runtime.sendMessage({ type: "test", apiKey: key, model: $("model").value.trim() || "jev-latest" });
+  const r = await chrome.runtime.sendMessage({ type: "test", apiKey: key, model: $("model").value.trim() || "jev-latest", apiUrl: $("apiUrl").value.trim() || XQF_DEFAULTS.apiUrl });
   if (r.ok) {
     await chrome.storage.sync.set({ apiKey: key });
     setKeyStatus(`Connected to ${r.model}. Open x.com — Sift is on.`, true);
@@ -65,7 +66,7 @@ $("connect").addEventListener("click", async () => {
 });
 $("apiKey").addEventListener("keydown", (e) => { if (e.key === "Enter") $("connect").click(); });
 
-for (const id of ["mode", "filterReplies", "showBadges", "hideSidebar", "model"]) $(id).addEventListener("change", autosave);
+for (const id of ["mode", "filterReplies", "showBadges", "hideSidebar", "model", "apiUrl"]) $(id).addEventListener("change", autosave);
 for (const id of ["allowlist", "blocklist", "stopPhrases"]) $(id).addEventListener("blur", autosave);
 $("save").addEventListener("click", save);
 $("resetPhrases").addEventListener("click", () => { $("stopPhrases").value = XQF_DEFAULTS.stopPhrases; autosave(); });

@@ -11,6 +11,7 @@
   ],
   "host_permissions": [
     "https://api.typesafe.ai/*",
+    "https://openrouter.ai/*",
     "https://x.com/*",
     "https://twitter.com/*"
   ],

@@ -1,7 +1,9 @@
 // Service worker: talks to TypeSafe Jev, caches verdicts, keeps stats.
 importScripts("defaults.js");
 
-const API_URL = "https://api.typesafe.ai/v1/systemone";
+// Default Jev endpoint; the user can point apiUrl at any compatible server
+// (e.g. OpenRouter's proxy: https://openrouter.ai/api/v1/systemone).
+const DEFAULT_API_URL = "https://api.typesafe.ai/v1/systemone";
 const CACHE_KEY = "xqf_cache";
 const STATS_KEY = "xqf_stats";
 const CACHE_MAX = 4000;
@@ -48,11 +50,11 @@ function scheduleSave() {
 }
 
 // ---- Jev call ----------------------------------------------------------
-async function askJev(state, apiKey, model) {
+async function askJev(state, apiKey, model, apiUrl) {
   const body = JSON.stringify({ state, model: model || "jev-latest", questions: XQF_QUESTIONS });
   let lastErr;
   for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch(API_URL, {
+    const res = await fetch(apiUrl || DEFAULT_API_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body
@@ -96,7 +98,7 @@ function pump() {
     running++;
     (async () => {
       try {
-        const resp = await askJev(job.state, settings.apiKey, settings.model);
+        const resp = await askJev(job.state, settings.apiKey, settings.model, settings.apiUrl);
         const v = toVerdict(resp);
         cache.set(job.id, v);
         stats.analyzed++;
@@ -204,7 +206,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         try {
           const r = await askJev(
             { author: "test", text: "Bookmark this. Most people will never understand this simple system 🧵👇" },
-            msg.apiKey || settings.apiKey, msg.model || settings.model
+            msg.apiKey || settings.apiKey, msg.model || settings.model,
+            msg.apiUrl || settings.apiUrl
           );
           sendResponse({ ok: true, verdict: toVerdict(r), model: r.model });
         } catch (e) {
